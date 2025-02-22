@@ -3,7 +3,6 @@ package com.traduzzo.traduzzoApi.controllers;
 import com.traduzzo.traduzzoApi.dtos.registrarUsuario.RegistrarUsuarioRespostaDTO;
 import com.traduzzo.traduzzoApi.dtos.registrarUsuario.RegistrarUsuarioDTO;
 import com.traduzzo.traduzzoApi.services.ServicoDeUsuario;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +26,7 @@ public class ControladorDeUsuario {
 
     @PostMapping("/registrar")
     public ResponseEntity<RegistrarUsuarioRespostaDTO> registrarUsuario(
-            @Valid @RequestBody RegistrarUsuarioDTO registrarUsuarioDTO
+            @RequestBody RegistrarUsuarioDTO registrarUsuarioDTO
     ) {
         RegistrarUsuarioRespostaDTO autenticacaoRespostaDTO = servicoDeUsuario.registrarUsuario(registrarUsuarioDTO);
 

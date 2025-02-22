@@ -3,6 +3,7 @@ package com.traduzzo.traduzzoApi;
 import com.traduzzo.traduzzoApi.objetosDeValor.Email;
 import com.traduzzo.traduzzoApi.repositories.RepositorioDeUsuario;
 import com.traduzzo.traduzzoApi.services.ServicoDeToken;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 public class FiltroDeAutenticacaoPorToken extends OncePerRequestFilter {
@@ -56,10 +58,16 @@ public class FiltroDeAutenticacaoPorToken extends OncePerRequestFilter {
 
     private Authentication obterAutenticacao(String token) {
         String subject = servicoDeToken.validarTokenDoUsuario(token);
-        UserDetails userDetails = repositorioDeUsuario.findByEmail(Email.converterDeString(subject));
+        Optional<UserDetails> userDetails = repositorioDeUsuario.findByEmail(Email.converterDeString(subject));
+
+        if (userDetails.isEmpty()) {
+            throw new EntityNotFoundException(
+                    "Usuário não encontrado com o e-mail: " + Email.converterDeString(subject)
+            );
+        }
 
         return new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities()
+                userDetails, null, userDetails.get().getAuthorities()
         );
     }
 

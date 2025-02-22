@@ -5,7 +5,6 @@ import com.traduzzo.traduzzoApi.dtos.autenticacao.AutenticacaoRespostaDTO;
 import com.traduzzo.traduzzoApi.entities.user.EntidadeUsuario;
 import com.traduzzo.traduzzoApi.services.ServicoDeToken;
 import com.traduzzo.traduzzoApi.services.ServicoDeUsuario;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,7 +32,7 @@ public class ControladorDeAutenticacao {
 
 
     @PostMapping("/login")
-    public ResponseEntity<AutenticacaoRespostaDTO> login(@Valid @RequestBody AutenticacaoDTO autenticacaoDTO) {
+    public ResponseEntity<AutenticacaoRespostaDTO> login(@RequestBody AutenticacaoDTO autenticacaoDTO) {
         Authentication usuarioAutenticado = servicoDeUsuario.autenticarUsuario(autenticacaoDTO, authenticationManager);
 
         String token = servicoDeToken.gerarTokenDoUsuario((EntidadeUsuario) usuarioAutenticado.getPrincipal());

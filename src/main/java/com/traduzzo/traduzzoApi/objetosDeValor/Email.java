@@ -2,7 +2,6 @@ package com.traduzzo.traduzzoApi.objetosDeValor;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import java.util.regex.Pattern;
 
@@ -14,8 +13,6 @@ public class Email {
             "(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
     );
 
-    @NotBlank(message = "O e-mail não pode estar em branco")
-    @jakarta.validation.constraints.Email(message = "Formato de e-mail inválido")
     @JsonValue
     private final String valor;
 

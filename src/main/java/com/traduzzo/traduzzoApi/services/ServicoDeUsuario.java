@@ -4,9 +4,11 @@ import com.traduzzo.traduzzoApi.dtos.autenticacao.AutenticacaoDTO;
 import com.traduzzo.traduzzoApi.dtos.registrarUsuario.RegistrarUsuarioRespostaDTO;
 import com.traduzzo.traduzzoApi.dtos.registrarUsuario.RegistrarUsuarioDTO;
 import com.traduzzo.traduzzoApi.entities.user.EntidadeUsuario;
+import com.traduzzo.traduzzoApi.excecoes.EntityAlreadyPresentException;
 import com.traduzzo.traduzzoApi.objetosDeValor.Email;
 import com.traduzzo.traduzzoApi.objetosDeValor.Senha;
 import com.traduzzo.traduzzoApi.repositories.RepositorioDeUsuario;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,8 +31,10 @@ public class ServicoDeUsuario implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return repositorioDeUsuario.findByEmail(Email.converterDeString(username));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return repositorioDeUsuario
+                .findByEmail(Email.converterDeString(email))
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com o e-mail: " + email));
     }
 
 
@@ -56,8 +60,8 @@ public class ServicoDeUsuario implements UserDetailsService {
 
 
     private void verificarSeUsuarioJaExiste(Email email) {
-        if (repositorioDeUsuario.findByEmail(email) != null) {
-            throw new RuntimeException("E-mail já cadastrado!");
+        if (repositorioDeUsuario.findByEmail(email).isPresent()) {
+            throw new EntityAlreadyPresentException("E-mail já cadastrado!");
         }
     }
 

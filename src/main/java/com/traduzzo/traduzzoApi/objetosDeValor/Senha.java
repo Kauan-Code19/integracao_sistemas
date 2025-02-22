@@ -2,9 +2,6 @@ package com.traduzzo.traduzzoApi.objetosDeValor;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
@@ -15,9 +12,6 @@ public class Senha {
 
     private static final String REGEX_SENHA = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}$";
 
-    @NotBlank(message = "A senha não pode estar em branco")
-    @Size(min = 8, message = "A senha deve ter no mínimo 8 caracteres")
-    @Pattern(regexp = REGEX_SENHA, message = REGRAS_SENHA)
     @JsonValue
     private final String valor;
 

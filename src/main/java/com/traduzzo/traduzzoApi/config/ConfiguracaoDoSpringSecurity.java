@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -36,6 +37,7 @@ public class ConfiguracaoDoSpringSecurity {
                 .sessionManagement(this::configurarGerenciamentoDeSessao)
                 .authorizeHttpRequests(this::configurarAutorizacoes)
                 .addFilterBefore(filtroDeAutenticacaoPorToken, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(this::configurarTratamentoDeExcecoes)
                 .build();
     }
 
@@ -51,6 +53,13 @@ public class ConfiguracaoDoSpringSecurity {
                 .requestMatchers(HttpMethod.POST, "/autenticacao/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/usuario/registrar").hasRole("ADMINISTRADOR")
                 .anyRequest().authenticated();
+    }
+
+
+    private void configurarTratamentoDeExcecoes(ExceptionHandlingConfigurer<HttpSecurity> exception) {
+        exception.authenticationEntryPoint((request, response, authException) -> {
+            throw authException;
+        });
     }
 
 
