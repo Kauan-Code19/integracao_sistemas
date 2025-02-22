@@ -2,13 +2,19 @@
 Api do sistema traduzzo
 
 # Arquivos de propriedades
-Para uma melhor separação dos ambientes, crie dois arquivos
-chamados application-development.properties e application-production.properties
-dentro da pasta resources.
+Para separar os ambientes de forma mais organizada, crie três arquivos dentro
+da pasta resources:
 
-Caso você queira utilizar um dos arquivos criados, será necessário
-definir isso no arquivo principal application.properties,
-escolhendo um perfil e configurando: spring.profiles.active=nome_do_perfil.
+application.properties
+application-development.properties
+application-production.properties
 
-Todos os atributos que possuem a anotação @Value("nome_da_propriedade")
-devem ser definidos em um arquivo de propriedade.
+Por padrão, se nenhum perfil for definido, o arquivo principal será o
+application.properties.
+
+Se desejar utilizar um dos arquivos específicos, defina o perfil no arquivo
+principal, configurando a seguinte propriedade:
+spring.profiles.active=nome_do_perfil
+
+Além disso, todos os atributos anotados com @Value("nome_da_propriedade") devem
+estar definidos em um dos arquivos de propriedades.
