@@ -1,6 +1,7 @@
 package com.traduzzo.traduzzoApi.config;
 
 import com.traduzzo.traduzzoApi.FiltroDeAutenticacaoPorToken;
+import com.traduzzo.traduzzoApi.controllers.ControladorDeManipuladorDeExcecoes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +12,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
-import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,10 +24,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class ConfiguracaoDoSpringSecurity {
 
     private final FiltroDeAutenticacaoPorToken filtroDeAutenticacaoPorToken;
+    private final ControladorDeManipuladorDeExcecoes manipuladorDeExcecoes;
 
     @Autowired
-    public ConfiguracaoDoSpringSecurity(FiltroDeAutenticacaoPorToken filtroDeAutenticacaoPorToken) {
+    public ConfiguracaoDoSpringSecurity(FiltroDeAutenticacaoPorToken filtroDeAutenticacaoPorToken,
+                                        ControladorDeManipuladorDeExcecoes manipuladorDeExcecoes) {
         this.filtroDeAutenticacaoPorToken = filtroDeAutenticacaoPorToken;
+        this.manipuladorDeExcecoes = manipuladorDeExcecoes;
     }
 
     @Bean
@@ -37,7 +40,7 @@ public class ConfiguracaoDoSpringSecurity {
                 .sessionManagement(this::configurarGerenciamentoDeSessao)
                 .authorizeHttpRequests(this::configurarAutorizacoes)
                 .addFilterBefore(filtroDeAutenticacaoPorToken, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(this::configurarTratamentoDeExcecoes)
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(manipuladorDeExcecoes))
                 .build();
     }
 
@@ -53,13 +56,6 @@ public class ConfiguracaoDoSpringSecurity {
                 .requestMatchers(HttpMethod.POST, "/autenticacao/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/usuario/registrar").hasRole("ADMINISTRADOR")
                 .anyRequest().authenticated();
-    }
-
-
-    private void configurarTratamentoDeExcecoes(ExceptionHandlingConfigurer<HttpSecurity> exception) {
-        exception.authenticationEntryPoint((request, response, authException) -> {
-            throw authException;
-        });
     }
 
 
