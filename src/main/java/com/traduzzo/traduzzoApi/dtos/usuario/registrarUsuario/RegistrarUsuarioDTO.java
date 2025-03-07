@@ -1,4 +1,4 @@
-package com.traduzzo.traduzzoApi.dtos.registrarUsuario;
+package com.traduzzo.traduzzoApi.dtos.usuario.registrarUsuario;
 
 import com.traduzzo.traduzzoApi.entities.user.PerfilDoUsuario;
 import com.traduzzo.traduzzoApi.objetosDeValor.Email;

@@ -1,8 +1,9 @@
 package com.traduzzo.traduzzoApi.services;
 
 import com.traduzzo.traduzzoApi.dtos.autenticacao.AutenticacaoDTO;
-import com.traduzzo.traduzzoApi.dtos.registrarUsuario.RegistrarUsuarioRespostaDTO;
-import com.traduzzo.traduzzoApi.dtos.registrarUsuario.RegistrarUsuarioDTO;
+import com.traduzzo.traduzzoApi.dtos.usuario.registrarUsuario.RegistrarUsuarioRespostaDTO;
+import com.traduzzo.traduzzoApi.dtos.usuario.registrarUsuario.RegistrarUsuarioDTO;
+import com.traduzzo.traduzzoApi.dtos.usuario.RetornarUsuarioDTO;
 import com.traduzzo.traduzzoApi.entities.user.EntidadeUsuario;
 import com.traduzzo.traduzzoApi.excecoes.EntityAlreadyPresentException;
 import com.traduzzo.traduzzoApi.objetosDeValor.Email;
@@ -19,6 +20,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ServicoDeUsuario implements UserDetailsService {
@@ -84,4 +87,13 @@ public class ServicoDeUsuario implements UserDetailsService {
         );
     }
 
+
+    public List<RetornarUsuarioDTO> retornarTodosUsuarios() {
+        return repositorioDeUsuario.findAll()
+                .stream()
+                .map(usuario -> new RetornarUsuarioDTO(
+                        usuario.getId(), usuario.getEmail(), usuario.getPerfil())
+                )
+                .collect(Collectors.toList());
+    }
 }
