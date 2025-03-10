@@ -52,6 +52,13 @@ public class EntidadeUsuario implements UserDetails {
     private PerfilDoUsuario perfil;
 
 
+    public EntidadeUsuario(Email email, PerfilDoUsuario perfil, Senha senha) {
+        this.email = email;
+        this.perfil = perfil;
+        this.senha = senha;
+    }
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();

@@ -1,8 +1,8 @@
 package com.traduzzo.traduzzoApi.services;
 
 import com.traduzzo.traduzzoApi.dtos.autenticacao.AutenticacaoDTO;
-import com.traduzzo.traduzzoApi.dtos.usuario.registrarUsuario.RegistrarUsuarioRespostaDTO;
-import com.traduzzo.traduzzoApi.dtos.usuario.registrarUsuario.RegistrarUsuarioDTO;
+import com.traduzzo.traduzzoApi.dtos.usuario.AtualizarUsuarioDTO;
+import com.traduzzo.traduzzoApi.dtos.usuario.RegistrarUsuarioDTO;
 import com.traduzzo.traduzzoApi.dtos.usuario.RetornarUsuarioDTO;
 import com.traduzzo.traduzzoApi.entities.user.EntidadeUsuario;
 import com.traduzzo.traduzzoApi.excecoes.EntityAlreadyPresentException;
@@ -17,19 +17,25 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
 public class ServicoDeUsuario implements UserDetailsService {
 
+    private final PasswordEncoder passwordEncoder;
+
     private final RepositorioDeUsuario repositorioDeUsuario;
 
     @Autowired
-    public ServicoDeUsuario(RepositorioDeUsuario repositorioDeUsuario) {
+    public ServicoDeUsuario(PasswordEncoder passwordEncoder, RepositorioDeUsuario repositorioDeUsuario) {
+        this.passwordEncoder = passwordEncoder;
         this.repositorioDeUsuario = repositorioDeUsuario;
     }
 
@@ -43,57 +49,121 @@ public class ServicoDeUsuario implements UserDetailsService {
 
     public Authentication autenticarUsuario(AutenticacaoDTO autenticacaoDTO,
                                             AuthenticationManager authenticationManager) {
-        return authenticationManager
-                .authenticate(
-                        new UsernamePasswordAuthenticationToken(autenticacaoDTO.email().getValor(),
-                                autenticacaoDTO.senha().getValor())
-                );
+        return authenticationManager.authenticate(criarTokenAutenticacao(autenticacaoDTO));
+    }
+
+
+    private UsernamePasswordAuthenticationToken criarTokenAutenticacao(AutenticacaoDTO autenticacaoDTO) {
+        return new UsernamePasswordAuthenticationToken(
+                autenticacaoDTO.email().getValor(),
+                autenticacaoDTO.senha().getValor()
+        );
     }
 
 
     @Transactional
-    public RegistrarUsuarioRespostaDTO registrarUsuario(RegistrarUsuarioDTO registrarUsuarioDTO) {
+    public RetornarUsuarioDTO registrarUsuario(RegistrarUsuarioDTO registrarUsuarioDTO) {
         verificarSeUsuarioJaExiste(registrarUsuarioDTO.email());
 
         EntidadeUsuario entidadeUsuario = criarEntidadeUsuario(registrarUsuarioDTO);
         repositorioDeUsuario.save(entidadeUsuario);
 
-        return criarRespostaAutenticacao(entidadeUsuario);
+        return criarRespostaUsuario(entidadeUsuario);
     }
 
 
     private void verificarSeUsuarioJaExiste(Email email) {
-        if (repositorioDeUsuario.findByEmail(email).isPresent()) {
-            throw new EntityAlreadyPresentException("E-mail já cadastrado!");
-        }
+        repositorioDeUsuario.findByEmail(email)
+                .ifPresent(usuario -> {
+                    throw new EntityAlreadyPresentException("E-mail já cadastrado!");
+                });
     }
 
 
     private EntidadeUsuario criarEntidadeUsuario(RegistrarUsuarioDTO registrarUsuarioDTO) {
-        String senhaHash = new BCryptPasswordEncoder().encode(registrarUsuarioDTO.senha().getValor());
+        return new EntidadeUsuario(
+                registrarUsuarioDTO.email(),
+                registrarUsuarioDTO.perfil(),
+                criptografarSenha(registrarUsuarioDTO.senha().getValor())
+        );
+    }
 
-        EntidadeUsuario usuario = new EntidadeUsuario();
-        usuario.setEmail(registrarUsuarioDTO.email());
-        usuario.setPerfil(registrarUsuarioDTO.perfil());
-        usuario.setSenha(Senha.converterDeString(senhaHash));
+
+    @Transactional
+    public RetornarUsuarioDTO atualizarUsuarioPorId(Long id, AtualizarUsuarioDTO atualizarUsuarioDTO) {
+        EntidadeUsuario entidadeUsuario = buscarUsuarioPorId(id);
+        repositorioDeUsuario.save(setarNovosValoresEntidadeUsuario(entidadeUsuario, atualizarUsuarioDTO));
+
+        return criarRespostaUsuario(entidadeUsuario);
+    }
+
+
+    public RetornarUsuarioDTO retornarUsuarioPorId(Long id) {
+        EntidadeUsuario entidadeUsuario = buscarUsuarioPorId(id);
+        return criarRespostaUsuario(entidadeUsuario);
+    }
+
+
+    @Transactional(readOnly = true)
+    private EntidadeUsuario buscarUsuarioPorId(Long id) {
+        return repositorioDeUsuario.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Usuário não encontrado com o ID: " + id)
+                );
+    }
+
+
+    private EntidadeUsuario setarNovosValoresEntidadeUsuario(
+            EntidadeUsuario usuario,
+            AtualizarUsuarioDTO atualizarUsuarioDTO
+    ) {
+        if (atualizarUsuarioDTO.email() != null && !atualizarUsuarioDTO.email().isBlank()) {
+            Email emailConvertido = Email.converterDeString(atualizarUsuarioDTO.email());
+            atualizarSeDiferente(usuario::getEmail, usuario::setEmail, emailConvertido);
+        }
+
+        atualizarSenhaSeNecessario(usuario, atualizarUsuarioDTO.senha());
+        atualizarSeDiferente(usuario::getPerfil, usuario::setPerfil, atualizarUsuarioDTO.perfil());
 
         return usuario;
     }
 
 
-    private RegistrarUsuarioRespostaDTO criarRespostaAutenticacao(EntidadeUsuario Entidadeusuario) {
-        return new RegistrarUsuarioRespostaDTO(
-                Entidadeusuario.getId(), Entidadeusuario.getEmail(), Entidadeusuario.getPerfil()
+    private void atualizarSenhaSeNecessario(EntidadeUsuario usuario, String senha) {
+        if (senha != null && !senha.isBlank()) {
+            Senha senhaConvertida = Senha.converterDeString(senha);
+            usuario.setSenha(criptografarSenha(senhaConvertida.getValor()));
+        }
+    }
+
+
+    private <T> void atualizarSeDiferente(Supplier<T> getter, Consumer<T> setter, T novoValor) {
+        if (!Objects.equals(getter.get(), novoValor)) {
+            setter.accept(novoValor);
+        }
+    }
+
+
+    private Senha criptografarSenha(String senha) {
+        String senhaHash = passwordEncoder.encode(senha);
+        return Senha.converterDeString(senhaHash);
+    }
+
+
+    private RetornarUsuarioDTO criarRespostaUsuario(EntidadeUsuario entidadeusuario) {
+        return new RetornarUsuarioDTO(
+                entidadeusuario.getId(),
+                entidadeusuario.getEmail(),
+                entidadeusuario.getPerfil()
         );
     }
 
 
+    @Transactional(readOnly = true)
     public List<RetornarUsuarioDTO> retornarTodosUsuarios() {
         return repositorioDeUsuario.findAll()
                 .stream()
-                .map(usuario -> new RetornarUsuarioDTO(
-                        usuario.getId(), usuario.getEmail(), usuario.getPerfil())
-                )
+                .map(this::criarRespostaUsuario)
                 .collect(Collectors.toList());
     }
 }
