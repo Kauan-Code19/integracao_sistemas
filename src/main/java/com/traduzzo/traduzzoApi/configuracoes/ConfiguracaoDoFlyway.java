@@ -1,4 +1,4 @@
-package com.traduzzo.traduzzoApi.config;
+package com.traduzzo.traduzzoApi.configuracoes;
 
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Autowired;

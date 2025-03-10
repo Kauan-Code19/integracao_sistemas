@@ -1,6 +1,6 @@
-package com.traduzzo.traduzzoApi.repositories;
+package com.traduzzo.traduzzoApi.repositorios;
 
-import com.traduzzo.traduzzoApi.entities.user.EntidadeUsuario;
+import com.traduzzo.traduzzoApi.entidades.usuario.EntidadeUsuario;
 import com.traduzzo.traduzzoApi.objetosDeValor.Email;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,7 +1,7 @@
-package com.traduzzo.traduzzoApi.config;
+package com.traduzzo.traduzzoApi.configuracoes;
 
 import com.traduzzo.traduzzoApi.FiltroDeAutenticacaoPorToken;
-import com.traduzzo.traduzzoApi.controllers.ControladorDeManipuladorDeExcecoes;
+import com.traduzzo.traduzzoApi.controladores.ControladorDeManipuladorDeExcecoes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

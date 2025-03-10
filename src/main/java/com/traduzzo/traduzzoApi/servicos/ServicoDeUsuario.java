@@ -1,14 +1,14 @@
-package com.traduzzo.traduzzoApi.services;
+package com.traduzzo.traduzzoApi.servicos;
 
 import com.traduzzo.traduzzoApi.dtos.autenticacao.AutenticacaoDTO;
 import com.traduzzo.traduzzoApi.dtos.usuario.AtualizarUsuarioDTO;
 import com.traduzzo.traduzzoApi.dtos.usuario.RegistrarUsuarioDTO;
 import com.traduzzo.traduzzoApi.dtos.usuario.RetornarUsuarioDTO;
-import com.traduzzo.traduzzoApi.entities.user.EntidadeUsuario;
+import com.traduzzo.traduzzoApi.entidades.usuario.EntidadeUsuario;
 import com.traduzzo.traduzzoApi.excecoes.EntityAlreadyPresentException;
 import com.traduzzo.traduzzoApi.objetosDeValor.Email;
 import com.traduzzo.traduzzoApi.objetosDeValor.Senha;
-import com.traduzzo.traduzzoApi.repositories.RepositorioDeUsuario;
+import com.traduzzo.traduzzoApi.repositorios.RepositorioDeUsuario;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;

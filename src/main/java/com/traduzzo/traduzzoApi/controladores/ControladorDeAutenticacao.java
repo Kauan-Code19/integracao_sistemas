@@ -1,10 +1,10 @@
-package com.traduzzo.traduzzoApi.controllers;
+package com.traduzzo.traduzzoApi.controladores;
 
 import com.traduzzo.traduzzoApi.dtos.autenticacao.AutenticacaoDTO;
 import com.traduzzo.traduzzoApi.dtos.autenticacao.AutenticacaoRespostaDTO;
-import com.traduzzo.traduzzoApi.entities.user.EntidadeUsuario;
-import com.traduzzo.traduzzoApi.services.ServicoDeToken;
-import com.traduzzo.traduzzoApi.services.ServicoDeUsuario;
+import com.traduzzo.traduzzoApi.entidades.usuario.EntidadeUsuario;
+import com.traduzzo.traduzzoApi.servicos.ServicoDeToken;
+import com.traduzzo.traduzzoApi.servicos.ServicoDeUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;

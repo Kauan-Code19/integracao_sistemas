@@ -1,8 +1,8 @@
 package com.traduzzo.traduzzoApi;
 
 import com.traduzzo.traduzzoApi.objetosDeValor.Email;
-import com.traduzzo.traduzzoApi.repositories.RepositorioDeUsuario;
-import com.traduzzo.traduzzoApi.services.ServicoDeToken;
+import com.traduzzo.traduzzoApi.repositorios.RepositorioDeUsuario;
+import com.traduzzo.traduzzoApi.servicos.ServicoDeToken;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

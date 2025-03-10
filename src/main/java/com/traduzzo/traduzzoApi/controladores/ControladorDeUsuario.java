@@ -1,9 +1,9 @@
-package com.traduzzo.traduzzoApi.controllers;
+package com.traduzzo.traduzzoApi.controladores;
 
 import com.traduzzo.traduzzoApi.dtos.usuario.AtualizarUsuarioDTO;
 import com.traduzzo.traduzzoApi.dtos.usuario.RetornarUsuarioDTO;
 import com.traduzzo.traduzzoApi.dtos.usuario.RegistrarUsuarioDTO;
-import com.traduzzo.traduzzoApi.services.ServicoDeUsuario;
+import com.traduzzo.traduzzoApi.servicos.ServicoDeUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,4 +1,4 @@
-package com.traduzzo.traduzzoApi.config;
+package com.traduzzo.traduzzoApi.configuracoes;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

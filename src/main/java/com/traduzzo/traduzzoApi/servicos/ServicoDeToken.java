@@ -1,10 +1,10 @@
-package com.traduzzo.traduzzoApi.services;
+package com.traduzzo.traduzzoApi.servicos;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.traduzzo.traduzzoApi.entities.user.EntidadeUsuario;
+import com.traduzzo.traduzzoApi.entidades.usuario.EntidadeUsuario;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.time.Instant;

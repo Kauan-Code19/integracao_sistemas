@@ -1,4 +1,4 @@
-package com.traduzzo.traduzzoApi.entities.user;
+package com.traduzzo.traduzzoApi.entidades.usuario;
 
 import lombok.Getter;
 
