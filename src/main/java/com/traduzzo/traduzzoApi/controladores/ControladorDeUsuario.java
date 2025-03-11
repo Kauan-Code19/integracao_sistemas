@@ -6,6 +6,7 @@ import com.traduzzo.traduzzoApi.dtos.usuario.RegistrarUsuarioDTO;
 import com.traduzzo.traduzzoApi.servicos.ServicoDeUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,5 +70,12 @@ public class ControladorDeUsuario {
     ) {
         RetornarUsuarioDTO usuarioDTO = servicoDeUsuario.atualizarUsuarioPorId(id, atualizarUsuarioDTO);
         return ResponseEntity.ok(usuarioDTO);
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirUsuarioPorId(@PathVariable Long id) {
+        servicoDeUsuario.excluirUsuarioPorId(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -55,6 +55,8 @@ public class ConfiguracaoDoSpringSecurity {
         authorize
                 .requestMatchers(HttpMethod.POST, "/autenticacao/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/usuario/registrar").hasRole("ADMINISTRADOR")
+                .requestMatchers(HttpMethod.PUT, "/usuario/{id}").hasRole("ADMINISTRADOR")
+                .requestMatchers(HttpMethod.DELETE, "/usuario/{id}").hasRole("ADMINISTRADOR")
                 .anyRequest().authenticated();
     }
 

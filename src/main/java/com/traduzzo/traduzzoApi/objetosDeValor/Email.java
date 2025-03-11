@@ -19,7 +19,7 @@ public class Email {
     @JsonCreator
     public Email(String valor) {
         verificarSeEmailEstaEmBranco(valor);
-        verificarSeEmailTemFormatoValido(valor);
+        validarFormatoOuFalhar(valor);
         this.valor = valor;
     }
 
@@ -31,10 +31,14 @@ public class Email {
     }
 
 
-    private void verificarSeEmailTemFormatoValido(String valor) {
+    private void validarFormatoOuFalhar(String valor) {
         if (!PADRAO_EMAIL.matcher(valor).matches()) {
-            throw new IllegalArgumentException("Formato de e-mail inválido");
+            throw new IllegalArgumentException("Formato de e-mail inválido.");
         }
+    }
+
+    protected static boolean formatoEmailEhValido(String valor) {
+        return valor != null && PADRAO_EMAIL.matcher(valor).matches();
     }
 
 

@@ -1,11 +1,22 @@
 package com.traduzzo.traduzzoApi.entidades.usuario;
 
+import com.traduzzo.traduzzoApi.conversores.ConversorParaPersistenciaDeCpfString;
 import com.traduzzo.traduzzoApi.conversores.ConversorParaPersistenciaDeEmailString;
+import com.traduzzo.traduzzoApi.conversores.ConversorParaPersistenciaDeNomeCompletoString;
 import com.traduzzo.traduzzoApi.conversores.ConversorParaPersistenciaDeSenhaString;
+import com.traduzzo.traduzzoApi.conversores.ConversorParaPersistenciaDeTelefoneString;
+import com.traduzzo.traduzzoApi.objetosDeValor.Cpf;
+import com.traduzzo.traduzzoApi.objetosDeValor.DadosBancarios;
 import com.traduzzo.traduzzoApi.objetosDeValor.Email;
+import com.traduzzo.traduzzoApi.objetosDeValor.Endereco;
+import com.traduzzo.traduzzoApi.objetosDeValor.NomeCompleto;
 import com.traduzzo.traduzzoApi.objetosDeValor.Senha;
+import com.traduzzo.traduzzoApi.objetosDeValor.Telefone;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -21,6 +32,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -47,15 +59,66 @@ public class EntidadeUsuario implements UserDetails {
     @Convert(converter = ConversorParaPersistenciaDeSenhaString.class)
     private Senha senha;
 
+    @Column(name = "cpf", nullable = false, updatable = false, unique = true)
+    @Convert(converter = ConversorParaPersistenciaDeCpfString.class)
+    private Cpf cpf;
+
+    @Column(name = "nome_completo", nullable = false, unique = true)
+    @Convert(converter = ConversorParaPersistenciaDeNomeCompletoString.class)
+    private NomeCompleto nomeCompleto;
+
+    @Column(name = "data_nascimento")
+    private LocalDate dataNascimento;
+
+    @Column(name = "telefone", nullable = false, unique = true)
+    @Convert(converter = ConversorParaPersistenciaDeTelefoneString.class)
+    private Telefone telefone;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "logradouro", column = @Column(name = "logradouro")),
+            @AttributeOverride(name = "numero", column = @Column(name = "numero")),
+            @AttributeOverride(name = "bairro", column = @Column(name = "bairro")),
+            @AttributeOverride(name = "cep", column = @Column(name = "cep")),
+            @AttributeOverride(name = "cidade", column = @Column(name = "cidade")),
+            @AttributeOverride(name = "estado", column = @Column(name = "estado"))
+    })
+    private Endereco endereco;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "banco", column = @Column(name = "banco_usuario")),
+            @AttributeOverride(name = "conta", column = @Column(name = "conta_bancaria")),
+            @AttributeOverride(name = "agencia", column = @Column(name = "agencia_bancaria")),
+            @AttributeOverride(name = "chavePix", column = @Column(name = "chave_pix_usuario"))
+    })
+    private DadosBancarios dadosBancarios;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "perfil", nullable = false)
     private PerfilDoUsuario perfil;
 
 
-    public EntidadeUsuario(Email email, PerfilDoUsuario perfil, Senha senha) {
+    public EntidadeUsuario(
+            Email email,
+            Cpf cpf,
+            Senha senha,
+            NomeCompleto nomeCompleto,
+            LocalDate dataNascimento,
+            Telefone telefone,
+            Endereco endereco,
+            DadosBancarios dadosBancarios,
+            PerfilDoUsuario perfil
+    ) {
         this.email = email;
-        this.perfil = perfil;
         this.senha = senha;
+        this.cpf = cpf;
+        this.nomeCompleto = nomeCompleto;
+        this.dataNascimento = dataNascimento;
+        this.telefone = telefone;
+        this.endereco = endereco;
+        this.dadosBancarios = dadosBancarios;
+        this.perfil = perfil;
     }
 
 

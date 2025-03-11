@@ -20,8 +20,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -83,9 +86,23 @@ public class ServicoDeUsuario implements UserDetailsService {
     private EntidadeUsuario criarEntidadeUsuario(RegistrarUsuarioDTO registrarUsuarioDTO) {
         return new EntidadeUsuario(
                 registrarUsuarioDTO.email(),
-                registrarUsuarioDTO.perfil(),
-                criptografarSenha(registrarUsuarioDTO.senha().getValor())
+                registrarUsuarioDTO.cpf(),
+                criptografarSenha(registrarUsuarioDTO.senha().getValor()),
+                registrarUsuarioDTO.nomeCompleto(),
+                registrarUsuarioDTO.dataNascimento()
+                        .map(this::formatarDataNascimento)
+                        .orElse(null),
+                registrarUsuarioDTO.telefone(),
+                registrarUsuarioDTO.endereco().orElse(null),
+                registrarUsuarioDTO.dadosBancarios().orElse(null),
+                registrarUsuarioDTO.perfil()
         );
+    }
+
+
+    private LocalDate formatarDataNascimento(LocalDate dataNascimento) {
+        String dataFormatada = dataNascimento.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        return LocalDate.parse(dataFormatada, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
 
 
@@ -104,6 +121,13 @@ public class ServicoDeUsuario implements UserDetailsService {
     }
 
 
+    @Transactional
+    public void excluirUsuarioPorId(Long id) {
+        buscarUsuarioPorId(id);
+        repositorioDeUsuario.deleteById(id);
+    }
+
+
     @Transactional(readOnly = true)
     private EntidadeUsuario buscarUsuarioPorId(Long id) {
         return repositorioDeUsuario.findById(id)
@@ -117,12 +141,67 @@ public class ServicoDeUsuario implements UserDetailsService {
             EntidadeUsuario usuario,
             AtualizarUsuarioDTO atualizarUsuarioDTO
     ) {
-        if (atualizarUsuarioDTO.email() != null && !atualizarUsuarioDTO.email().isBlank()) {
-            Email emailConvertido = Email.converterDeString(atualizarUsuarioDTO.email());
-            atualizarSeDiferente(usuario::getEmail, usuario::setEmail, emailConvertido);
+        if (atualizarUsuarioDTO.email().isPresent()) {
+            atualizarSeDiferente(
+                    usuario::getEmail,
+                    usuario::setEmail,
+                    atualizarUsuarioDTO.email().get()
+            );
         }
 
-        atualizarSenhaSeNecessario(usuario, atualizarUsuarioDTO.senha());
+        if (atualizarUsuarioDTO.senha().isPresent()) {
+            atualizarSenhaSeNecessario(
+                    usuario,
+                    atualizarUsuarioDTO.senha().get().getValor());
+        }
+
+        if (atualizarUsuarioDTO.cpf().isPresent()) {
+            atualizarSeDiferente(
+                    usuario::getCpf,
+                    usuario::setCpf,
+                    atualizarUsuarioDTO.cpf().get());
+        }
+
+        if (atualizarUsuarioDTO.nomeCompleto().isPresent()) {
+            atualizarSeDiferente(
+                    usuario::getNomeCompleto,
+                    usuario::setNomeCompleto,
+                    atualizarUsuarioDTO.nomeCompleto().get());
+        }
+
+        if (atualizarUsuarioDTO.dataNascimento().isPresent()) {
+            LocalDate dataFormatada = formatarDataNascimento(atualizarUsuarioDTO.dataNascimento().get());
+            atualizarSeDiferente(
+                    usuario::getDataNascimento,
+                    usuario::setDataNascimento,
+                    dataFormatada
+            );
+        }
+
+        if (atualizarUsuarioDTO.telefone().isPresent()) {
+            atualizarSeDiferente(
+                    usuario::getTelefone,
+                    usuario::setTelefone,
+                    atualizarUsuarioDTO.telefone().get()
+            );
+        }
+
+        if (atualizarUsuarioDTO.endereco().isPresent()) {
+            atualizarSeDiferente(
+                    usuario::getEndereco,
+                    usuario::setEndereco,
+                    atualizarUsuarioDTO.endereco().get()
+            );
+        }
+
+        if (atualizarUsuarioDTO.dadosBancarios().isPresent()) {
+            atualizarSeDiferente(
+                    usuario::getDadosBancarios,
+                    usuario::setDadosBancarios,
+                    atualizarUsuarioDTO.dadosBancarios().get()
+            );
+        }
+
         atualizarSeDiferente(usuario::getPerfil, usuario::setPerfil, atualizarUsuarioDTO.perfil());
 
         return usuario;
@@ -154,6 +233,12 @@ public class ServicoDeUsuario implements UserDetailsService {
         return new RetornarUsuarioDTO(
                 entidadeusuario.getId(),
                 entidadeusuario.getEmail(),
+                entidadeusuario.getCpf(),
+                entidadeusuario.getNomeCompleto(),
+                Optional.ofNullable(entidadeusuario.getDataNascimento()),
+                entidadeusuario.getTelefone(),
+                Optional.ofNullable(entidadeusuario.getEndereco()),
+                Optional.ofNullable(entidadeusuario.getDadosBancarios()),
                 entidadeusuario.getPerfil()
         );
     }
