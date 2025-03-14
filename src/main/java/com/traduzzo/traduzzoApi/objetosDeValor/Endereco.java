@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
 @Embeddable
 @NoArgsConstructor(force = true)
 public class Endereco {
-    private static final Pattern PADRAO_LOGRADOURO = Pattern.compile("^[A-Za-zÀ-ÖØ-öø-ÿ\\s]+$");
-    private static final Pattern PADRAO_NUMERO = Pattern.compile("^[0-9A-Za-z]+$");
-    private static final Pattern PADRAO_CEP = Pattern.compile("^\\d{8}$");
+    private static final Pattern PADRAO_NUMERO = Pattern.compile("^[0-9A-Za-z\\s]*$");
+    private static final Pattern PADRAO_CEP = Pattern.compile("^\\d{0,8}$");
+    private static final int TAMANHO_CEP = 8;
     private static final int TAMANHO_MIN_CIDADE = 6;
     private static final int TAMANHO_MAX_CIDADE = 30;
 
@@ -35,22 +35,12 @@ public class Endereco {
     ) {
         validarPreenchimentoCamposEndereco(logradouro, numero, bairro, cep, cidade, estado);
 
-        validarLogradouro(logradouro);
         this.logradouro = logradouro;
-
-        validarNumero(numero);
-        this.numero = numero;
-
+        this.numero = campoPreenchido(numero) ? validarNumero(numero) : null;
         this.bairro = bairro;
-
-        validarCep(cep);
-        this.cep = cep;
-
-        validarCidade(cidade);
-        this.cidade = cidade;
-
-        validarEstado(estado);
-        this.estado = estado;
+        this.cep = campoPreenchido(cep) ? validarCep(cep) : null;
+        this.cidade = campoPreenchido(cidade) ? validarCidade(cidade) : null;
+        this.estado = campoPreenchido(estado) ? validarEstado(estado) : null;
     }
 
     private void validarPreenchimentoCamposEndereco(
@@ -61,18 +51,34 @@ public class Endereco {
             String cidade,
             String estado
     ) {
-        boolean algumPreenchido = campoPreenchido(logradouro) || campoPreenchido(numero) ||
-                campoPreenchido(bairro) || campoPreenchido(cep) ||
-                campoPreenchido(cidade) || campoPreenchido(estado);
+        boolean logradouroPreenchido = campoPreenchido(logradouro);
+        boolean numeroPreenchido = campoPreenchido(numero);
+        boolean bairroPreenchido = campoPreenchido(bairro);
+        boolean cepPreenchido = campoPreenchido(cep);
+        boolean cidadePreenchida = campoPreenchido(cidade);
+        boolean estadoPreenchido = campoPreenchido(estado);
 
-        boolean todosPreenchidos = campoPreenchido(logradouro) && campoPreenchido(numero) &&
-                campoPreenchido(bairro) && campoPreenchido(cep) &&
-                campoPreenchido(cidade) && campoPreenchido(estado);
+        boolean algumPreenchido = logradouroPreenchido || numeroPreenchido || bairroPreenchido ||
+                cepPreenchido || cidadePreenchida || estadoPreenchido;
+
+        boolean todosPreenchidos = logradouroPreenchido && numeroPreenchido && bairroPreenchido &&
+                cepPreenchido && cidadePreenchida && estadoPreenchido;
 
         if (algumPreenchido && !todosPreenchidos) {
-            throw new IllegalArgumentException("Todos os campos de endereço devem" +
-                    " estar preenchidos ou todos vazios.");
+            throw new IllegalArgumentException(
+                    "Todos os campos de endereço devem estar preenchidos ou todos vazios."
+            );
         }
+
+        if (campoBranco(logradouro) || campoBranco(numero) || campoBranco(bairro) ||
+                campoBranco(cep) || campoBranco(cidade) || campoBranco(estado)) {
+            throw new IllegalArgumentException("Os campos do endereço não podem estar em branco.");
+        }
+    }
+
+
+    private boolean campoBranco(String campo) {
+        return campo != null && campo.isBlank();
     }
 
 
@@ -81,37 +87,45 @@ public class Endereco {
     }
 
 
-    private void validarLogradouro(String logradouro) {
-        if (!PADRAO_LOGRADOURO.matcher(logradouro).matches()) {
-            throw new IllegalArgumentException("O logradouro deve conter apenas letras e espaços.");
-        }
-    }
-
-
-    private void validarNumero(String numero) {
+    private String validarNumero(String numero) {
         if (!PADRAO_NUMERO.matcher(numero).matches()) {
             throw new IllegalArgumentException("O número deve ser apenas numérico ou alfanumérico.");
         }
+
+        return numero;
     }
 
 
-    private void validarCep(String cep) {
+    private String validarCep(String cep) {
         if (!PADRAO_CEP.matcher(cep).matches()) {
-            throw new IllegalArgumentException("O CEP deve conter exatamente 8 dígitos numéricos.");
+            throw new IllegalArgumentException(
+                    "O CEP deve conter exatamente " + TAMANHO_CEP + " dígitos numéricos.");
         }
+
+        return cep;
     }
 
 
-    private void validarCidade(String cidade) {
-        if (cidade.length() < TAMANHO_MIN_CIDADE || cidade.length() > TAMANHO_MAX_CIDADE) {
-            throw new IllegalArgumentException("O nome da cidade deve ter entre 6 e 30 caracteres.");
+    private String validarCidade(String cidade) {
+        if (
+                (cidade.length() < TAMANHO_MIN_CIDADE || cidade.length() > TAMANHO_MAX_CIDADE)
+                        && !cidade.isBlank()
+        ) {
+            throw new IllegalArgumentException(
+                    "O nome da cidade deve ter entre " + TAMANHO_MIN_CIDADE +
+                            " e " + TAMANHO_MAX_CIDADE + " caracteres."
+            );
         }
+
+        return cidade;
     }
 
 
-    private void validarEstado(String estado) {
-        if (!Estado.estadoValido(estado)) {
+    private String validarEstado(String estado) {
+        if (!Estado.estadoValido(estado) && !estado.isBlank()) {
             throw new IllegalArgumentException("O estado deve ser uma sigla válida (ex: SP, RJ, MG).");
         }
+
+        return estado;
     }
 }

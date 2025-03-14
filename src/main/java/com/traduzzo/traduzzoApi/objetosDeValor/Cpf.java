@@ -62,7 +62,7 @@ public class Cpf {
         for (int i = 0; i < 3; i++) {
             String bloco = valor.substring(i * 3, (i + 1) * 3);
             if (repetido(bloco)) {
-                throw new IllegalArgumentException("O CPF contém blocos com dígitos repetidos: " + bloco);
+                throw new IllegalArgumentException("O cpf contém blocos com dígitos repetidos: " + bloco);
             }
         }
     }
@@ -78,7 +78,9 @@ public class Cpf {
         int digitoVerificadorCalculado = calcularDigitoVerificador(somaMultiplicada);
 
         if (digitoVerificadorIncorreto(digitoVerificadorCalculado, this.penultimoDigito)) {
-            throw new IllegalArgumentException("O penúltimo dígito verificador está incorreto.");
+            throw new IllegalArgumentException(
+                    "O penúltimo dígito verificador está incorreto: " + this.penultimoDigito
+            );
         }
     }
 
@@ -108,7 +110,9 @@ public class Cpf {
         int ultimoDigito = obterUltimoDigito(valor);
 
         if (digitoVerificadorIncorreto(digitoVerificadorCalculado, ultimoDigito)) {
-            throw new IllegalArgumentException("O último dígito verificador está incorreto.");
+            throw new IllegalArgumentException(
+                    "O último dígito verificador está incorreto: " + ultimoDigito
+            );
         }
     }
 

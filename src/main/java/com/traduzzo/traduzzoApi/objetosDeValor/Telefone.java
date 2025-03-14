@@ -40,8 +40,8 @@ public class Telefone {
 
     private void verificarSeTelefoneTemFormatoValido(String valor) {
         if (!PADRAO_TELEFONE_CELULAR.matcher(valor).matches() && !PADRAO_TELEFONE_FIXO.matcher(valor).matches()) {
-            throw new IllegalArgumentException("O telefone deve seguir o formato: +55DDD9XXXXXXXX" +
-                    " para celular ou +55DDDXFFFFFF para fixo");
+            throw new IllegalArgumentException(
+                    "Formato inválido! Use '+55DDD9XXXXXXXX' para celular ou '+55DDDXXXXXXXX' para fixo.");
         }
     }
 

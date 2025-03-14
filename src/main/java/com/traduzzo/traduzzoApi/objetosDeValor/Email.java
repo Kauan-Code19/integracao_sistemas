@@ -37,6 +37,7 @@ public class Email {
         }
     }
 
+
     protected static boolean formatoEmailEhValido(String valor) {
         return valor != null && PADRAO_EMAIL.matcher(valor).matches();
     }
