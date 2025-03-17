@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.traduzzo</groupId>
-	<artifactId>traduzzoApi</artifactId>
+	<artifactId>IntegracaoSistema</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>traduzzoApi</name>
 	<description>Demo project for Spring Boot</description>

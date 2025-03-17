@@ -1,7 +1,3 @@
-# Traduzzo API
-
-Api do sistema Traduzzo
-
 ## Requisitos
 
 Para rodar o projeto em sua máquina, é necessário ter as seguintes instalações:
