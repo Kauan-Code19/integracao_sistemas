@@ -1,10 +1,10 @@
-package com.traduzzo.traduzzoApi;
+package com.integracao.IntegracaoSistemaApi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class TraduzzoApiApplicationTests {
+class IntegracaoSistemaApiApplicationTests {
 
 	@Test
 	void contextLoads() {
